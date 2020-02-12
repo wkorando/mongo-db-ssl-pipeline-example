@@ -55,6 +55,9 @@ stages:
   - name: build_proprties
     value: build.properties
     type: file
+  - name: SSL_CERT
+    value: test
+    type: secure
   jobs:
   - name: Build Docker image
     type: builder
@@ -79,6 +82,8 @@ stages:
       # Build a Docker image into IBM Container Service private image registry.
       # Minting image tag using format: BUILD_NUMBER-BRANCH-COMMIT_ID-TIMESTAMP
       # Also copies information into a build.properties file, so they can be reused later on by other scripts (e.g. image url, chart name, ...)
+	  ${SSL_CERT} | base64 --decode > mongodb.crt
+	  
       source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/build_image.sh")
 - name: PROD
   inputs:
@@ -95,9 +100,6 @@ stages:
     value: undefined
     type: text
   - name: build_proprties
-    value: build.properties
-    type: file
-  - name: SSL_Cert
     value: build.properties
     type: file
   jobs:
@@ -120,5 +122,6 @@ stages:
       # source: https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/check_and_deploy_kubectl.sh
 
       # This script checks the IBM Container Service cluster is ready, has a namespace configured with access to the private
-      # image registry (using an IBM Cloud API Key), perform a kubectl deploy of container image and check on outcome.
+      # image registry (using an IBM Cloud API Key), perform a kubectl deploy of container image and check on outcome.	 
+	  
       source <(curl -sSL "https://raw.githubusercontent.com/open-toolchain/commons/master/scripts/check_and_deploy_kubectl.sh")
