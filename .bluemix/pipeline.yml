@@ -56,8 +56,8 @@ stages:
     value: build.properties
     type: file
   - name: SSL_CERT
-    value: test
-    type: secure
+    value: default
+    type: text
   jobs:
   - name: Build Docker image
     type: builder
