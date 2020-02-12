@@ -1,0 +1,43 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    run: mongodb-service
+  name: mongodb-service
+  namespace: default
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      run: mongodb-service
+  template:
+    metadata:
+      labels:
+        run: mongodb-service
+    spec:
+      containers:
+      - image: ${REGISTRY_URL}/${REGISTRY_NAMESPACE}/${IMAGE_NAME}:${IMAGE_TAG}
+        name: mongodb-service
+        args: ["--spring.application.json=$(BINDING)"]
+        env:
+        - name: BINDING
+          valueFrom:
+            secretKeyRef:
+              name: binding-mongodb-ssl-test
+              key: binding  
+---
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    run: mongodb-service
+  name: mongodb-service-port
+  namespace: default
+spec:
+  selector:
+    run: mongodb-service
+  ports:
+    - port: 8080
+      name: http
+  type: NodePort
